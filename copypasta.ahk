@@ -16,7 +16,7 @@ Extensions := "txt,docx,doc"
 TopLevel := "topLevel"
 
 ; Menu Builder
-Loop, Files, *, R
+Loop, Files, *, FDR
 {
     ; Checks if the current file is an accepted type, if not we go to the next iteration.
     if A_LoopFileExt not in %Extensions% ;or A_LoopFileName = ""
@@ -30,10 +30,38 @@ Loop, Files, *, R
 
     ; Adds sub level menu for files in a subfolder
     else
-    {
+    {       
+        ; Used to split the path so we can get the different directory names.
+        subDirs := ""
+        ; The menu object we want to attach to.
+        menuLevel := A_LoopFileDir
+        nestedLevel := %TopLevel%
+        ; The directory the file is in.
+        fileDir := A_LoopFileDir
+        
+        ; This will help us have nested submenus.
+        IfInString, A_LoopFileDir, \
+        {   
+            ; Split our current directory into an array.
+            subDirs := StrSplit(A_LoopFileDir, "\")
+            
+            ; Reset our menu object name, and the directory the file is in.
+            menuLevel := ""
+            fileDir := ""
+            
+            ; Creates the menu level we want.
+            Loop % subDirs.Length() - 1
+                menuLevel := % menuLevel . subDirs[A_Index]
+            MsgBox, % menuLevel
+
+            ; Get the lowest dir of the file.
+            fileDir := subDirs[subDirs.Length()]
+            MsgBox, % fileDir
+        }
+
         ; The \ after LoopFileDir is needed so the pathing is correct when we rebuild the full path in the file handler.
-        Menu, %A_LoopFileDir%\, Add, %A_LoopFileName%, FileHandler
-        Menu, %TopLevel%, Add, %A_LoopFileDir%, :%A_LoopFileDir%\
+        Menu, %menuLevel%\, Add, %A_LoopFileName%, FileHandler
+        Menu, %nestedLevel%, Add, %fileDir%, :%menuLevel%\
     }
 }
 return
@@ -59,7 +87,7 @@ PastaFunc(pathName, itemName)
     ; pathName is blank if item is in the top level, and will have the trailing \ if it is in a submenu because we add it to the menu name when creating the submenu.
     itemPath := % A_WorkingDir . "\" . pathName . itemName
     
-    ; For doc type files we go to the rich text function
+    ; For doc/docx type files we go to the rich text function
     if A_ThisMenuItem contains .doc
         RichText(itemPath)
 
