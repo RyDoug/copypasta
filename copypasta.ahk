@@ -11,7 +11,7 @@ When you select a menu item, the contents of the specified text file will be cop
 */
 
 ; Specifies the accepted file extensions.
-Extensions := "txt,docx,doc"
+Extensions := "txt,docx,doc,bmp"
 ; Name of the toplevel menu
 TopLevel := "topLevel"
 
@@ -67,6 +67,9 @@ PastaFunc(pathName, itemName)
     else if A_ThisMenuItem contains .txt
         PlainText(itemPath)
 
+    else if A_ThisMenuItem contains .bm
+        ImageToClipboard(itemPath)
+
     ; This sleep helps make sure the paste finished before setting clipboard back to the backup.
     sleep 500
     ; Restore clipboard
@@ -101,6 +104,32 @@ PlainText(path)
 {
     ; Reads the file, and adds it to the clipboard.
     FileRead, Clipboard, %path%
+
+    ; Ensures the clipboard is not empty
+    ClipWait, 1, 1
+
+    ; Paste
+    Send ^v
+    return
+}
+
+ImageToClipboard(Filename)
+{
+    hbm := DllCall("LoadImage","uint",0,"str",Filename,"uint",0,"int",0,"int",0,"uint",0x10)
+    if !hbm
+        return
+
+    DllCall("OpenClipboard","uint",0)
+    DllCall("EmptyClipboard")
+    ; Place the data on the clipboard. CF_BITMAP=0x2
+	; DllCall("SetClipboardData","uint",0x2,"uint",hbm)
+
+    if !DllCall("SetClipboardData","uint",0x2,"uint",hbm)
+	{
+	  msgbox problem in BMPImageToClipboard
+	  DllCall("DeleteObject","uint",hbm)
+	}
+    DllCall("CloseClipboard")
 
     ; Ensures the clipboard is not empty
     ClipWait, 1, 1
