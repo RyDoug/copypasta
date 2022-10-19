@@ -14,7 +14,15 @@ In the new folder, you can add subfolders and the files you wish to copy paste.
 
 - It isn't recommended to utilize nested folders currently, as they aren't working as expected.
 
-Double click CopyPasta to run the program.
+Example:
+
+![root folder example for copypasta](docs/folder-structure-example.png)
+
+Example:
+
+![subfolder example for copypasta](docs/folder-structure-example-2.png)
+
+Double click copypasta.exe to run the program.
 
 ### Commands
 
@@ -25,7 +33,7 @@ Double click CopyPasta to run the program.
 - This will show the menu which lists all the folders and files in the root of where you ran CopyPasta from.
 - Use your arrow keys and the enter key or your mouse to select a file.
 
-
+![Menu example](docs/menu-example.png)
 
 #### Rebuild Menu
 
